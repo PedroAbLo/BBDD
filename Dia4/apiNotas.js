@@ -27,29 +27,17 @@ app.use(express.json());
 //=============VERBOS===========================
 
 app.get("/notas", 
-        function(request, response)
-        {
+        function(request, response){
             let sql;
             let id = request.query.id;
+            if(id == undefined){
+                sql = "SELECT m.mark_id, s.first_name, sub.title, m.mark FROM marks AS m JOIN subjects AS sub ON ( sub.subject_id = m.subject_id) JOIN students AS s ON (s.student_id = m.student_id)";
 
-            if(id === undefined){
-                if (id == null){
-                    sql = "SELECT * FROM marks";
-                }else{
-                    sql = "SELECT * FROM marks WHERE mark_id= " + id;
-                }
-    
-                connection.query(sql, (err,result)=>{
-                    if (err) 
-                        console.log(err);
-                    else{
-                        response.send(result);
-                    }
-                })
             }else{
-                let sql = "SELECT * FROM marks WHERE mark_id= " + id;
+                sql = "SELECT m.mark_id, s.first_name, sub.title, m.mark FROM marks AS m JOIN subjects AS sub ON ( sub.subject_id = m.subject_id) JOIN students AS s ON (s.student_id = m.student_id) WHERE m.student_id = " + id;
                 console.log(sql);  
-                connection.query(sql, (err,result)=>{
+            }
+            connection.query(sql, (err,result)=>{
                     if (err){
                         console.log(err);
                     }else{
@@ -57,19 +45,13 @@ app.get("/notas",
                         response.send(result);
                     }
                 })
-            }
-
         });
         
 app.post("/notas", 
         function(request, response)
         {
             console.log(request.body);
-            let sql = "INSERT INTO marks (student_id, subject_id, date, mark) " + 
-                    "VALUES ('" + request.body.student_id + "', '" + 
-                                  request.body.subject_id + "', '" +
-                                  request.body.date + "', '" +
-                                  request.body.mark + "')";
+            let sql = `INSERT INTO marks (student_id, subject_id, mark) VALUES (${request.body.student_id},  ${request.body.subject_id}, ${request.body.mark})`;
             console.log(sql);                      
             connection.query(sql, (err, result)=>{
                 if (err) 
@@ -92,11 +74,10 @@ app.put("/notas",
             console.log(request.body);
             let params = [request.body.student_id, 
                           request.body.subject_id, 
-                          request.body.date,
-                          request.body.mark,
-                          request.body.id]
+                          request.body.mark]
+                          
 
-            let sql = "UPDATE marks SET student_id = COALESCE(?, student_id) , subject_id = COALESCE(?, subject_id) , date = COALESCE(?, date), mark = COALESCE(?, mark) WHERE mark_id = ?" 
+            let sql = `UPDATE marks SET student_id = COALESCE(?, student_id) , subject_id = COALESCE(?, subject_id) , mark = COALESCE(?, mark) WHERE mark_id = ` + request.body.mark_id; 
         
             console.log(sql); 
             connection.query(sql, params,(err, result)=>{
@@ -112,9 +93,9 @@ app.put("/notas",
 app.delete("/notas", 
         function(request, response)
         {
-            let id = request.body.id;
+            let id = request.body.mark_id;
             console.log(request.body);
-            let sql = "DELETE FROM marks WHERE mark_id = '" + id + "'";
+            let sql = "DELETE FROM marks WHERE mark_id = " + id;
             console.log(sql); 
             connection.query(sql, (err, result)=>{
                 if (err) 

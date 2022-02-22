@@ -30,7 +30,7 @@ app.use(express.json());
 app.get("/media", 
     function(request, response)
     {   let id = request.query.id;
-        let sql = "SELECT AVG(mark) FROM marks WHERE student_id =" + id;
+        let sql = "SELECT AVG(mark) AS media FROM marks WHERE student_id =" + id;
         console.log(sql);  
         connection.query(sql,(err, result) =>{
             if (err) 
@@ -56,7 +56,7 @@ app.get("/apuntadas",
                 if (id == null){
                     sql = "SELECT s.first_name, s.last_name, sub.title FROM subjects AS sub JOIN marks as m ON ( m.subject_id = sub.subject_id) JOIN students as s ON ( m.student_id = s.student_id) ORDER BY s.first_name";
                 }else{
-                    sql = "SELECT title FROM subjects AS sub JOIN marks as m ON ( m.subject_id = sub.subject_id) WHERE student_id = " + id;
+                    sql = "SELECT s.first_name, s.last_name, sub.title FROM subjects AS sub JOIN marks as m ON ( m.subject_id = sub.subject_id) JOIN students as s ON ( m.student_id = s.student_id) WHERE m.student_id = " + id;
                 }
     
                 connection.query(sql, (err,result)=>{
@@ -67,7 +67,7 @@ app.get("/apuntadas",
                     }
                 })
             }else{
-                let sql = "SELECT title FROM subjects AS sub JOIN marks as m ON ( m.subject_id = sub.subject_id) WHERE student_id = " + id;
+                let sql = "SELECT s.first_name, s.last_name, sub.title FROM subjects AS sub JOIN marks as m ON ( m.subject_id = sub.subject_id) JOIN students as s ON ( m.student_id = s.student_id)  WHERE m.student_id = " + id;
                 console.log(sql);  
                 connection.query(sql, (err,result)=>{
                     if (err){

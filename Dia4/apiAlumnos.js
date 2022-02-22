@@ -51,11 +51,7 @@ app.post("/alumnos",
         function(request, response)
         {
             console.log(request.body);
-            let sql = "INSERT INTO students (first_name, last_name, group_id, añoIngreso) " + 
-                    "VALUES ('" + request.body.first_name + "', '" + 
-                                  request.body.last_name + "', '" +
-                                  request.body.group_id + "', '" +
-                                  request.body.añoIngreso + "')";
+            let sql = `INSERT INTO students (first_name, last_name, group_id) VALUES ("${request.body.first_name}", "${request.body.last_name}", ${request.body.group_id})`;
             console.log(sql);                      
             connection.query(sql, (err, result)=>{
                 if (err) 
@@ -78,12 +74,9 @@ app.put("/alumnos",
             console.log(request.body);
             let params = [request.body.first_name, 
                           request.body.last_name, 
-                          request.body.group_id,
-                          request.body.añoIngreso,
-                          request.body.id]
+                          request.body.group_id]
 
-            let sql = "UPDATE students SET first_name = COALESCE(?, first_name) , last_name = COALESCE(?, last_name) , " + 
-            "group_id = COALESCE(?, group_id), añoIngreso = COALESCE(?, añoIngreso) WHERE student_id = ?" 
+            let sql = `UPDATE students SET first_name = COALESCE(?, first_name) , last_name = COALESCE(?, last_name) , group_id = COALESCE(?, group_id) WHERE student_id = ${request.body.student_id}` 
 
             console.log(sql); 
             connection.query(sql, params,(err, result)=>{
@@ -96,12 +89,13 @@ app.put("/alumnos",
         }
         ); 
         
+
 app.delete("/alumnos", 
         function(request, response)
         {
-            let id = request.body.id;
+            let id = request.body.student_id;
             console.log(request.body);
-            let sql = "DELETE FROM students WHERE student_id = '" + id + "'";
+            let sql = `DELETE FROM students WHERE student_id = ${id}` ;
             console.log(sql); 
             connection.query(sql, (err, result)=>{
                 if (err) 
